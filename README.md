@@ -283,7 +283,7 @@ O protótipo da Sprint 2 tem cerca de 14 mil linhas de HTML, CSS e JavaScript pu
 
 ## Deploy na Vercel
 
-**Link do deploy:**
+**Link do deploy:** https://lenslabweb.vercel.app/
 
 **Link do repositório GitHub:** https://github.com/MarceloScoleso/lenslabweb
 
