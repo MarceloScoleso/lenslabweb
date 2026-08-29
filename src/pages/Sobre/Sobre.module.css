@@ -1,0 +1,305 @@
+.page {
+  min-height: calc(100vh - var(--header-h));
+  background: var(--bg);
+}
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+.header {
+  position: relative;
+  padding: 3.5rem 0 3rem;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.headerFundo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(680px 320px at 8% -20%, rgba(0, 200, 150, 0.14), transparent 65%),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px;
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+}
+
+.headerConteudo {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-06);
+  border: 1px solid var(--accent-20);
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 1.15rem;
+}
+
+.header h1 {
+  font-size: clamp(1.85rem, 4vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.highlight {
+  color: var(--accent);
+}
+
+.header p {
+  color: var(--text-2);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 58ch;
+}
+
+.content {
+  padding: 3rem 0 4.5rem;
+}
+
+/* =========================================================
+   CARDS DE TEXTO
+   ========================================================= */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.textoCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  transition: border-color var(--transition);
+}
+
+.textoCard:hover {
+  border-color: var(--line-2);
+}
+
+.cardLabel {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 0.85rem;
+}
+
+.textoCard h2 {
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.textoCard p {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.textoCard p:last-child {
+  margin-bottom: 0;
+}
+
+.textoCard strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.escopo {
+  font-size: 0.875rem !important;
+  color: var(--text-3) !important;
+  border-left: 2px solid var(--line-2);
+  padding-left: 0.85rem;
+}
+
+.slogan {
+  color: var(--accent) !important;
+  font-style: italic;
+  padding: 0.9rem 1.1rem;
+  background: var(--accent-06);
+  border: 1px solid var(--accent-20);
+  border-radius: var(--radius-sm);
+  margin-top: 1.35rem !important;
+}
+
+/* =========================================================
+   CABEÇALHO DE SEÇÃO
+   ========================================================= */
+.secaoHeader {
+  margin-bottom: 2rem;
+}
+
+.secaoEyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.secaoHeader h2 {
+  font-size: 1.6rem;
+  letter-spacing: -0.035em;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.secaoHeader p {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  max-width: 62ch;
+}
+
+/* =========================================================
+   EQUIPE
+   ========================================================= */
+.equipeSection {
+  margin-bottom: 4rem;
+}
+
+.equipeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.membroCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 1.75rem 1.35rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: border-color var(--transition), transform var(--transition),
+    background-color var(--transition);
+}
+
+.membroCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-40);
+  background: var(--surface-2);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--accent-12);
+  border: 1px solid var(--accent-20);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  margin: 0 auto 1rem;
+  transition: background-color var(--transition);
+}
+
+.membroCard:hover .avatar {
+  background: var(--accent-20);
+}
+
+.membroCard h3 {
+  font-size: 0.9375rem;
+  color: var(--text);
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.rm {
+  font-family: var(--font-mono);
+  color: var(--text-3);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+}
+
+.papel {
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  margin-top: 0.4rem;
+}
+
+/* =========================================================
+   TECNOLOGIAS
+   ========================================================= */
+.tecnologiasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.tecItem {
+  padding: 1rem 1.15rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent-40);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.tecItem:hover {
+  background: var(--surface-2);
+  border-left-color: var(--accent);
+}
+
+.tecItem strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.2rem;
+}
+
+.tecItem span {
+  color: var(--text-3);
+  font-size: 0.8125rem;
+}
+
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
+@media (max-width: 991px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .equipeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tecnologiasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .equipeGrid,
+  .tecnologiasGrid {
+    grid-template-columns: 1fr;
+  }
+  .textoCard {
+    padding: 1.35rem;
+  }
+}
