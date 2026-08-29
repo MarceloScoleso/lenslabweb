@@ -1,0 +1,20 @@
+INTEGRANTES DO GRUPO
+====================
+
+Nome: Marcelo Antônio Scoleso Junior
+RM: 571626
+
+Nome: João Paulo Francisco de Oliveira
+RM: 571306
+
+Nome: Julia Souza Matarazzo
+RM: 571340
+
+Nome: Gabriel Souza Alexandre Silva
+RM: 572607
+
+Projeto: LensLab - Câmera Inteligente para Estudantes
+Disciplina: Web Development
+Instituição: FIAP
+Sprint: 3
+Ano: 2026
