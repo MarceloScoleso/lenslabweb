@@ -1,0 +1,305 @@
+.home {
+  background: var(--bg);
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+.hero {
+  position: relative;
+  padding: 5.5rem 0 5rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Brilho de marca + grade técnica de fundo */
+.heroFundo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(760px 380px at 12% -10%, rgba(0, 200, 150, 0.16), transparent 65%),
+    radial-gradient(620px 420px at 92% 8%, rgba(76, 201, 224, 0.08), transparent 65%),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px;
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: center;
+  gap: 3.5rem;
+}
+
+.heroContent {
+  max-width: 620px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-06);
+  border: 1px solid var(--accent-20);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 1.5rem;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: piscar 2.4s ease-in-out infinite;
+}
+
+@keyframes piscar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.title {
+  font-size: clamp(2.75rem, 6vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  margin-bottom: 1.25rem;
+}
+
+.highlight {
+  color: var(--accent);
+}
+
+.subtitle {
+  font-size: 1.0625rem;
+  color: var(--text-2);
+  line-height: 1.65;
+  max-width: 52ch;
+  margin-bottom: 2.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ===== Moldura decorativa do visor ===== */
+.visor {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(0, 200, 150, 0.07), transparent 70%),
+    var(--surface);
+  display: grid;
+  place-items: center;
+}
+
+.visorCanto {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  opacity: 0.7;
+}
+
+.visorCanto[data-canto='tl'] { top: 14px; left: 14px; border-right: 0; border-bottom: 0; border-radius: 4px 0 0 0; }
+.visorCanto[data-canto='tr'] { top: 14px; right: 14px; border-left: 0; border-bottom: 0; border-radius: 0 4px 0 0; }
+.visorCanto[data-canto='bl'] { bottom: 14px; left: 14px; border-right: 0; border-top: 0; border-radius: 0 0 0 4px; }
+.visorCanto[data-canto='br'] { bottom: 14px; right: 14px; border-left: 0; border-top: 0; border-radius: 0 0 4px 0; }
+
+.visorConteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  color: var(--accent);
+}
+
+.visorLabel {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  color: var(--text-3);
+}
+
+.visorLinhas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 96px;
+  margin-top: 0.25rem;
+}
+
+.visorLinhas span {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line-2);
+}
+
+.visorLinhas span:nth-child(1) { width: 100%; }
+.visorLinhas span:nth-child(2) { width: 70%; background: var(--accent-40); }
+.visorLinhas span:nth-child(3) { width: 45%; }
+
+/* =========================================================
+   SEÇÕES
+   ========================================================= */
+.section,
+.sectionAlt {
+  padding: 4.5rem 0;
+}
+
+.sectionAlt {
+  background: var(--bg-soft);
+  border-top: 1px solid var(--line);
+}
+
+.sectionHeader {
+  margin-bottom: 2.25rem;
+}
+
+.sectionEyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.sectionHeader h2 {
+  font-size: 1.75rem;
+  letter-spacing: -0.035em;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.sectionHeader p {
+  color: var(--text-2);
+  font-size: 0.95rem;
+}
+
+/* ===== Grades ===== */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.actionCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 1.65rem;
+  display: block;
+  transition: border-color var(--transition), transform var(--transition),
+    background-color var(--transition);
+}
+
+.actionCard:hover {
+  border-color: var(--accent-40);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+
+.actionIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-12);
+  color: var(--accent);
+  margin-bottom: 1.15rem;
+  transition: background-color var(--transition);
+}
+
+.actionCard:hover .actionIcon {
+  background: var(--accent-20);
+}
+
+.actionCard h3 {
+  font-size: 1.0625rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.actionCard p {
+  color: var(--text-2);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  max-width: 42ch;
+}
+
+.actionArrow {
+  position: absolute;
+  top: 1.65rem;
+  right: 1.65rem;
+  color: var(--text-3);
+  transition: color var(--transition), transform var(--transition);
+}
+
+.actionCard:hover .actionArrow {
+  color: var(--accent);
+  transform: translateX(3px);
+}
+
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
+@media (max-width: 991px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+  .visor {
+    display: none;
+  }
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .actionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 3.5rem 0 3.25rem;
+  }
+  .section,
+  .sectionAlt {
+    padding: 3rem 0;
+  }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions :global(.btn) {
+    width: 100%;
+  }
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
