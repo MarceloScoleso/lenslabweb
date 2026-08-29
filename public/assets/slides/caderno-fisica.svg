@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-label="Pagina de caderno com um exercicio de lancamento vertical">
+  <defs>
+    <linearGradient id="mesa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B2723"/>
+      <stop offset="1" stop-color="#16130F"/>
+    </linearGradient>
+    <linearGradient id="papel" x1="0.05" y1="0" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#FCF8EE"/>
+      <stop offset="0.55" stop-color="#F4EFE0"/>
+      <stop offset="1" stop-color="#E3DAC4"/>
+    </linearGradient>
+    <pattern id="pauta" width="1020" height="58" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="57" x2="1020" y2="57" stroke="#BFD0E2" stroke-width="2"/>
+    </pattern>
+    <filter id="sombraPapel" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <radialGradient id="luzPapel" cx="0.35" cy="0.15" r="0.95">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.28"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#mesa)"/>
+
+  <g transform="rotate(-2.4 600 450)" filter="url(#sombraPapel)">
+    <rect x="90" y="60" width="1020" height="780" rx="8" fill="url(#papel)"/>
+    <rect x="90" y="150" width="1020" height="638" fill="url(#pauta)"/>
+    <line x1="215" y1="60" x2="215" y2="840" stroke="#E0A9A9" stroke-width="3"/>
+
+    <!-- furos do fichário -->
+    <g fill="#D8CFB8">
+      <circle cx="150" cy="230" r="15"/>
+      <circle cx="150" cy="450" r="15"/>
+      <circle cx="150" cy="670" r="15"/>
+    </g>
+
+    <g fill="#22344E" font-family="Georgia, 'Times New Roman', serif">
+      <text x="250" y="132" font-size="40" font-style="italic">Física — lançamento vertical</text>
+
+      <text x="250" y="212" font-size="30" font-style="italic" opacity="0.9">Um corpo é lançado para cima com</text>
+      <text x="250" y="270" font-size="30" font-style="italic" opacity="0.9">v₀ = 20 m/s. Qual a altura máxima?</text>
+
+      <text x="250" y="386" font-size="32" font-style="italic">dados:  v₀ = 20 m/s    g = 10 m/s²</text>
+      <text x="250" y="444" font-size="32" font-style="italic">no ponto mais alto:  v = 0</text>
+
+      <text x="250" y="560" font-size="36" font-style="italic">v² = v₀² − 2 · g · h</text>
+      <text x="250" y="618" font-size="36" font-style="italic">0 = (20)² − 2 · 10 · h</text>
+      <text x="250" y="676" font-size="36" font-style="italic">h = ________</text>
+    </g>
+
+    <!-- esquema do lançamento, na lateral direita -->
+    <g stroke="#22344E" fill="none" stroke-width="3" opacity="0.75">
+      <line x1="900" y1="720" x2="900" y2="330"/>
+      <path d="M900 330 l-16 34 M900 330 l16 34"/>
+      <line x1="820" y1="720" x2="990" y2="720"/>
+      <line x1="820" y1="340" x2="990" y2="340" stroke-dasharray="10 12"/>
+    </g>
+    <g fill="#22344E" font-family="Georgia, 'Times New Roman', serif" font-style="italic" opacity="0.8">
+      <text x="915" y="540" font-size="28">h</text>
+      <text x="828" y="322" font-size="24">v = 0</text>
+      <text x="828" y="762" font-size="24">v₀ = 20 m/s</text>
+    </g>
+  </g>
+
+  <rect width="1200" height="900" fill="url(#luzPapel)"/>
+</svg>
