@@ -68,6 +68,8 @@
   --animate-flutuar: flutuar 6s ease-in-out infinite;
   --animate-piscar: piscar 2.4s ease-in-out infinite;
   --animate-surgir: surgir 0.3s ease-out;
+  --animate-boiar: boiar 2s ease-in-out infinite;
+  --animate-progresso: progresso 2s ease-in-out infinite;
 
   /*
    * Ponto de virada do menu do app: acima dele a navegação é uma barra,
@@ -126,6 +128,43 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Ícone de "processando": sobe e desce enquanto a IA gera o material. */
+@keyframes boiar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* Barra indeterminada das telas de processamento. */
+@keyframes progresso {
+  0% {
+    width: 5%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Placar do quiz: halo verde quando foi bem, âmbar quando precisa revisar. */
+@utility fundo-placar-bom {
+  background:
+    radial-gradient(120% 140% at 50% -30%, rgba(0, 200, 150, 0.16), transparent 70%),
+    var(--surface);
+}
+
+@utility fundo-placar-revisar {
+  background:
+    radial-gradient(120% 140% at 50% -30%, rgba(242, 193, 78, 0.13), transparent 70%),
+    var(--surface);
 }
 
 /*
