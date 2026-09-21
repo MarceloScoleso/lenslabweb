@@ -66,6 +66,7 @@
  */
 @theme {
   --animate-flutuar: flutuar 6s ease-in-out infinite;
+  --animate-piscar: piscar 2.4s ease-in-out infinite;
 
   /*
    * Ponto de virada do menu do app: acima dele a navegação é uma barra,
@@ -84,4 +85,39 @@
   50% {
     transform: rotate(-3deg) translateY(-15px);
   }
+}
+
+/* Ponto verde de "gravando" do painel. */
+@keyframes piscar {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/*
+ * Fundos com várias camadas e máscara: são utilitários de verdade
+ * (@utility), e não CSS solto. Fora do Tailwind exigiriam um valor
+ * arbitrário gigante e ilegível dentro do JSX.
+ */
+
+/* Hero do painel: brilho da marca sobre uma grade técnica que some para baixo. */
+@utility fundo-painel {
+  background:
+    radial-gradient(760px 380px at 12% -10%, rgba(0, 200, 150, 0.16), transparent 65%),
+    radial-gradient(620px 420px at 92% 8%, rgba(76, 201, 224, 0.08), transparent 65%),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px;
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+/* Fundo do visor decorativo do painel. */
+@utility fundo-visor {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(0, 200, 150, 0.07), transparent 70%),
+    var(--surface);
 }
