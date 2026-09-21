@@ -2,12 +2,21 @@
  * tailwind.css
  * Entrada do Tailwind CSS v4 e ponte com os tokens do LensLab.
  *
- * Os valores continuam definidos uma única vez, em global.css (:root).
+ * Os valores continuam definidos uma única vez, em global.css (:root),
+ * importado logo abaixo.
  * O bloco @theme inline apenas expõe esses tokens como utilitários do
  * Tailwind, então bg-surface, text-accent, border-line e afins usam
  * exatamente as mesmas cores do resto da aplicação.
  */
 @import "tailwindcss";
+
+/*
+ * O CSS global do projeto entra na camada base do Tailwind.
+ * Sem isso, o reset do global.css (margin: 0, padding: 0, button sem
+ * fundo) ficaria fora de camada e, pelas regras de cascade layers,
+ * venceria todos os utilitários do Tailwind, que vivem em @layer utilities.
+ */
+@import "./global.css" layer(base);
 
 @theme inline {
   /* Superfícies */
