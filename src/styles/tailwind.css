@@ -71,6 +71,13 @@
   --animate-boiar: boiar 2s ease-in-out infinite;
   --animate-progresso: progresso 2s ease-in-out infinite;
 
+  /* Câmera: etiquetas, contagem regressiva, clarão do flash e folhas */
+  --animate-surgir-badge: surgir-badge 0.3s ease-out;
+  --animate-pulsar-numero: pulsar-numero 1s ease-out;
+  --animate-clarao: clarao 0.22s ease-out;
+  --animate-aparecer-fundo: aparecer-fundo 0.2s ease-out;
+  --animate-subir-folha: subir-folha 0.26s cubic-bezier(0.2, 0.9, 0.3, 1);
+
   /*
    * Ponto de virada do menu do app: acima dele a navegação é uma barra,
    * abaixo vira a gaveta lateral. Vale como variante (nav: e max-nav:).
@@ -151,6 +158,107 @@
   }
   100% {
     width: 100%;
+  }
+}
+
+/*
+ * Câmera. As etiquetas ficam centradas com translateX(-50%), então o
+ * deslocamento de entrada precisa vir junto no mesmo transform.
+ */
+@keyframes surgir-badge {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes pulsar-numero {
+  0% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.75;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes clarao {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes aparecer-fundo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes subir-folha {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Fundo da tela da câmera: dois brilhos sobre a grade técnica. */
+@utility fundo-camera {
+  background:
+    radial-gradient(700px 400px at 18% 10%, rgba(0, 200, 150, 0.13), transparent 65%),
+    radial-gradient(600px 400px at 85% 90%, rgba(76, 201, 224, 0.07), transparent 65%),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px;
+}
+
+/*
+ * Sliders dos ajustes da câmera. O polegar de um <input type="range"> só
+ * é alcançável por pseudo-elementos de fornecedor, que o Tailwind não cobre.
+ */
+@utility slider-camera {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: var(--surface-3);
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    cursor: pointer;
   }
 }
 
