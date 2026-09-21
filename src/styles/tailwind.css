@@ -67,6 +67,7 @@
 @theme {
   --animate-flutuar: flutuar 6s ease-in-out infinite;
   --animate-piscar: piscar 2.4s ease-in-out infinite;
+  --animate-surgir: surgir 0.3s ease-out;
 
   /*
    * Ponto de virada do menu do app: acima dele a navegação é uma barra,
@@ -113,6 +114,31 @@
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px;
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+/* Detalhes de um item da galeria, ao expandir. */
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * Seta do <select>: um SVG embutido como data URI. Vira utilitário porque
+ * dentro de um valor arbitrário do Tailwind as aspas e vírgulas do data URI
+ * tornariam a classe ilegível.
+ */
+@utility seta-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236A7975' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 15px;
 }
 
 /* Cabeçalho da página Sobre: mesma grade, brilho mais discreto. */
