@@ -77,7 +77,7 @@ function Home() {
                   className="animate-piscar h-[5px] w-[5px] rounded-full bg-accent shadow-[0_0_8px_var(--accent)]"
                   aria-hidden="true"
                 />
-                LensLab — Sprint 3
+                LensLab — Sprint 4
               </span>
 
               <h1 className="mb-5 text-[clamp(2.75rem,6vw,4.25rem)] font-bold leading-none tracking-[-0.045em]">
