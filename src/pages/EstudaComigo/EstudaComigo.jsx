@@ -1,14 +1,12 @@
-import { useState, useMemo } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { obter } from '../../services/photos.js'
-import { useLocalStorage } from '../../hooks/useLocalStorage.js'
-import { gerarResumo, gerarFlashcards, gerarQuiz } from '../../utils/ia-mock.js'
-import { gerarId, tempoAleatorio, calcularPercentual, arredondar } from '../../utils/math-utils.js'
+import { useState } from 'react'
+import { useLocation, Link } from 'react-router-dom'
+import { useEstudaComigo } from '../../hooks/useEstudaComigo.js'
+import { useMaterias } from '../../hooks/useMaterias.js'
+import { calcularPercentual, arredondar } from '../../utils/math-utils.js'
 import Icon from '../../components/Icon/Icon.jsx'
 import { MODOS } from '../../utils/modos-camera.js'
 import styles from './EstudaComigo.module.css'
 
-const MATERIAS = ['Matemática', 'Física', 'Química', 'Biologia', 'História', 'Português']
 
 /**
  * EstudaComigo - Modo principal da Sprint 3
@@ -29,63 +27,17 @@ const MATERIAS = ['Matemática', 'Física', 'Química', 'Biologia', 'História',
  *     |-- ResultadoQuiz (filho)
  */
 function EstudaComigo() {
-  const navigate = useNavigate()
   const location = useLocation()
-  const [notas, setNotas] = useLocalStorage('lenslab_notas', [])
+  const { materias } = useMaterias('estuda')
 
-  // Foto vinda da tela de câmera, quando o usuário chegou por lá
-  const fotoId = location.state?.fotoId || null
-  const foto = useMemo(() => (fotoId ? obter(fotoId) : null), [fotoId])
-
-  const [etapa, setEtapa] = useState('captura')
-  const [materia, setMateria] = useState('')
-  const [conteudo, setConteudo] = useState('')
-  const [material, setMaterial] = useState(null)
-  const [tempoProcessamento, setTempoProcessamento] = useState(0)
-  const [resultadoQuiz, setResultadoQuiz] = useState(null)
-
-  function iniciarCaptura() {
-    if (!materia || conteudo.length < 10) return
-
-    setEtapa('processando')
-    const inicioTempo = Date.now()
-    const tempoSimulado = tempoAleatorio(1500, 3000)
-
-    setTimeout(() => {
-      const resumo = gerarResumo(materia, conteudo)
-      const flashcards = gerarFlashcards(materia, conteudo, 5)
-      const quiz = gerarQuiz(materia, 4)
-
-      const tempoReal = Date.now() - inicioTempo
-      setTempoProcessamento(tempoReal)
-
-      setMaterial({
-        id: gerarId('nota'),
-        materia,
-        contexto: conteudo,
-        fotoId,
-        recursos: { resumo, flashcards, quiz },
-        timestamp: Date.now(),
-        tempoProcessamento: tempoReal
-      })
-
-      setEtapa('material')
-    }, tempoSimulado)
-  }
-
-  function salvarMaterial(resultado = null) {
-    const notaFinal = { ...material, resultadoQuiz: resultado }
-    setNotas([notaFinal, ...notas])
-    navigate('/galeria')
-  }
-
-  function reiniciar() {
-    setEtapa('captura')
-    setMateria('')
-    setConteudo('')
-    setMaterial(null)
-    setResultadoQuiz(null)
-  }
+  // Toda a lógica (estado, chamada à API, salvamento) vive no hook.
+  // Este componente só decide o que desenhar em cada etapa.
+  const {
+    foto, etapa, setEtapa,
+    materia, setMateria, conteudo, setConteudo,
+    material, tempoProcessamento, resultadoQuiz,
+    erro, iniciarCaptura, salvarMaterial, concluirQuiz, refazerQuiz, reiniciar
+  } = useEstudaComigo(location.state?.fotoId || null)
 
   return (
     <div className={styles.page}>
@@ -105,6 +57,8 @@ function EstudaComigo() {
           {etapa === 'captura' && (
             <FormularioCaptura
               foto={foto}
+              materias={materias}
+              erro={erro}
               materia={materia}
               setMateria={setMateria}
               conteudo={conteudo}
@@ -128,10 +82,7 @@ function EstudaComigo() {
           {etapa === 'quiz' && material && (
             <QuizPlayer
               quiz={material.recursos.quiz}
-              onConcluir={(resultado) => {
-                setResultadoQuiz(resultado)
-                setEtapa('resultado')
-              }}
+              onConcluir={concluirQuiz}
               onVoltar={() => setEtapa('material')}
             />
           )}
@@ -141,10 +92,7 @@ function EstudaComigo() {
               resultado={resultadoQuiz}
               materia={material.materia}
               onSalvar={() => salvarMaterial(resultadoQuiz)}
-              onRefazer={() => {
-                setResultadoQuiz(null)
-                setEtapa('quiz')
-              }}
+              onRefazer={refazerQuiz}
             />
           )}
         </div>
@@ -156,7 +104,7 @@ function EstudaComigo() {
 /**
  * FormularioCaptura - filho: entrada do material capturado
  */
-function FormularioCaptura({ foto, materia, setMateria, conteudo, setConteudo, onEnviar }) {
+function FormularioCaptura({ foto, materias, erro, materia, setMateria, conteudo, setConteudo, onEnviar }) {
   return (
     <div className={styles.card}>
       {foto ? (
@@ -186,7 +134,7 @@ function FormularioCaptura({ foto, materia, setMateria, conteudo, setConteudo, o
       <div className={styles.formGroup}>
         <span className={styles.groupLabel}>Matéria</span>
         <div className={styles.materiaGrid}>
-          {MATERIAS.map(m => (
+          {materias.map(m => (
             <button
               key={m}
               type="button"
@@ -214,6 +162,12 @@ function FormularioCaptura({ foto, materia, setMateria, conteudo, setConteudo, o
           {conteudo.length} caracteres (mínimo 10)
         </small>
       </div>
+
+      {erro && (
+        <p role="alert" className="mb-4 w-full rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-left text-sm text-danger">
+          {erro}
+        </p>
+      )}
 
       <button
         onClick={onEnviar}

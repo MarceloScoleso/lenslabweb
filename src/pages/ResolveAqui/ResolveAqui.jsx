@@ -1,15 +1,12 @@
-import { useState, useMemo, useEffect } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { obter } from '../../services/photos.js'
-import { useLocalStorage } from '../../hooks/useLocalStorage.js'
-import { gerarPassos } from '../../utils/ia-mock.js'
-import { gerarId, tempoAleatorio, formatarDuracao, arredondar } from '../../utils/math-utils.js'
+import { useState, useEffect } from 'react'
+import { useLocation, Link } from 'react-router-dom'
+import { useResolveAqui, MAX_DICAS, somarTempos } from '../../hooks/useResolveAqui.js'
+import { useMaterias } from '../../hooks/useMaterias.js'
+import { formatarDuracao, arredondar } from '../../utils/math-utils.js'
 import Icon from '../../components/Icon/Icon.jsx'
 import { MODOS } from '../../utils/modos-camera.js'
 import styles from './ResolveAqui.module.css'
 
-const MATERIAS = ['Matemática', 'Física', 'Química', 'Biologia']
-const MAX_DICAS = 3
 
 /**
  * Tempo que o estudante escolhe para cada passo antes de começar.
@@ -23,10 +20,6 @@ const OPCOES_TEMPO = [
   { rotulo: '3 min', segundos: 180 },
   { rotulo: '5 min', segundos: 300 }
 ]
-
-function somarTempos(acoes) {
-  return acoes.reduce((total, item) => total + (item.segundos || 0), 0)
-}
 
 /**
  * ResolveAqui - Modo de resolução guiada
@@ -45,85 +38,17 @@ function somarTempos(acoes) {
  *     |-- ResultadoFinal (filho)
  */
 function ResolveAqui() {
-  const navigate = useNavigate()
   const location = useLocation()
-  const [exercicios, setExercicios] = useLocalStorage('lenslab_exercicios', [])
+  const { materias } = useMaterias('resolve')
 
-  // Foto vinda da tela de câmera, quando o usuário chegou por lá
-  const fotoId = location.state?.fotoId || null
-  const foto = useMemo(() => (fotoId ? obter(fotoId) : null), [fotoId])
-
-  const [etapa, setEtapa] = useState('captura')
-  const [materia, setMateria] = useState('')
-  const [enunciado, setEnunciado] = useState('')
-  const [passos, setPassos] = useState([])
-  const [passoAtual, setPassoAtual] = useState(0)
-  const [acoesUsuario, setAcoesUsuario] = useState([])
-  const [dicasUsadas, setDicasUsadas] = useState(0)
-  const [limiteSegundos, setLimiteSegundos] = useState(null)
-  const [tempoProcessamento, setTempoProcessamento] = useState(0)
-
-  function iniciarResolucao() {
-    if (!materia || enunciado.length < 10) return
-
-    setEtapa('processando')
-    const inicioTempo = Date.now()
-
-    setTimeout(() => {
-      setPassos(gerarPassos(materia, enunciado))
-      setPassoAtual(0)
-      setAcoesUsuario([])
-      setDicasUsadas(0)
-      // Mesmo dado que o Estuda Comigo grava: quanto a "IA" levou para
-      // preparar o material. É o que alimenta o Tempo médio da Home.
-      setTempoProcessamento(Date.now() - inicioTempo)
-      setEtapa('resolvendo')
-    }, tempoAleatorio(1200, 2200))
-  }
-
-  function registrarAcao(acao, segundos) {
-    setAcoesUsuario([...acoesUsuario, { passo: passoAtual + 1, acao, segundos }])
-    if (passoAtual + 1 < passos.length) {
-      setPassoAtual(passoAtual + 1)
-    } else {
-      setEtapa('resultado')
-    }
-  }
-
-  function usarDica() {
-    if (dicasUsadas < MAX_DICAS) {
-      setDicasUsadas(dicasUsadas + 1)
-    }
-  }
-
-  function salvarResultado(acertou) {
-    const exercicioSalvo = {
-      id: gerarId('exercicio'),
-      materia,
-      enunciado,
-      fotoId,
-      passosConcluidos: passos.length,
-      dicasUsadas,
-      acertou,
-      acoes: acoesUsuario,
-      limiteSegundos,
-      tempoTotalSegundos: somarTempos(acoesUsuario),
-      tempoProcessamento,
-      timestamp: Date.now()
-    }
-    setExercicios([exercicioSalvo, ...exercicios])
-    navigate('/galeria')
-  }
-
-  function reiniciar() {
-    setEtapa('captura')
-    setMateria('')
-    setEnunciado('')
-    setPassos([])
-    setPassoAtual(0)
-    setAcoesUsuario([])
-    setDicasUsadas(0)
-  }
+  // Toda a lógica (estado, chamada à API, dicas, salvamento) vive no hook.
+  const {
+    foto, etapa,
+    materia, setMateria, enunciado, setEnunciado,
+    passos, passoAtual, acoesUsuario, dicasUsadas,
+    limiteSegundos, setLimiteSegundos, tempoProcessamento,
+    erro, iniciarResolucao, registrarAcao, usarDica, salvarResultado, reiniciar
+  } = useResolveAqui(location.state?.fotoId || null)
 
   return (
     <div className={styles.page}>
@@ -146,6 +71,8 @@ function ResolveAqui() {
           {etapa === 'captura' && (
             <FormularioExercicio
               foto={foto}
+              materias={materias}
+              erro={erro}
               materia={materia}
               setMateria={setMateria}
               enunciado={enunciado}
@@ -193,7 +120,7 @@ function ResolveAqui() {
 /**
  * FormularioExercicio - filho: entrada do exercício
  */
-function FormularioExercicio({ foto, materia, setMateria, enunciado, setEnunciado, limiteSegundos, setLimiteSegundos, onEnviar }) {
+function FormularioExercicio({ foto, materias, erro, materia, setMateria, enunciado, setEnunciado, limiteSegundos, setLimiteSegundos, onEnviar }) {
   return (
     <div className={styles.card}>
       {foto ? (
@@ -223,7 +150,7 @@ function FormularioExercicio({ foto, materia, setMateria, enunciado, setEnunciad
       <div className={styles.formGroup}>
         <span className={styles.groupLabel}>Matéria</span>
         <div className={styles.materiaGrid}>
-          {MATERIAS.map(m => (
+          {materias.map(m => (
             <button
               key={m}
               type="button"
@@ -272,6 +199,12 @@ function FormularioExercicio({ foto, materia, setMateria, enunciado, setEnunciad
           resolução: se o tempo acabar, você continua de onde parou.
         </small>
       </div>
+
+      {erro && (
+        <p role="alert" className="mb-4 w-full rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-left text-sm text-danger">
+          {erro}
+        </p>
+      )}
 
       <button
         onClick={onEnviar}
