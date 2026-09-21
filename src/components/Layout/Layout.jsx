@@ -4,7 +4,6 @@ import Header from '../Header/Header.jsx'
 import Footer from '../Footer/Footer.jsx'
 import Icon from '../Icon/Icon.jsx'
 import { armazenamentoDisponivel } from '../../utils/storage.js'
-import styles from './Layout.module.css'
 
 /**
  * Layout - Componente PAI que envolve todas as páginas
@@ -21,9 +20,9 @@ function Layout() {
   const [semArmazenamento] = useState(() => !armazenamentoDisponivel())
 
   return (
-    <div className={styles.layout}>
+    <div className="flex min-h-screen flex-col bg-bg">
       <Header />
-      <main className={styles.main}>
+      <main className="flex-1 pt-[var(--header-h)]">
         {semArmazenamento && <AvisoArmazenamento />}
         <Outlet />
       </main>
@@ -37,12 +36,17 @@ function Layout() {
  */
 function AvisoArmazenamento() {
   return (
-    <div className={styles.aviso} role="alert">
-      <span className={styles.avisoIcone}>
+    <div
+      role="alert"
+      className="mx-6 mt-4 flex max-w-[var(--container)] items-start gap-3 rounded-sm border border-warning/30 bg-warning/8 px-4 py-3.5 min-[1200px]:mx-auto"
+    >
+      <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-xs bg-warning/15 text-warning">
         <Icon nome="alerta" tamanho={17} />
       </span>
-      <p>
-        <strong>O navegador está bloqueando o armazenamento deste site.</strong>{' '}
+      <p className="text-sm leading-[1.55] text-ink-2">
+        <strong className="font-semibold text-warning">
+          O navegador está bloqueando o armazenamento deste site.
+        </strong>{' '}
         Você pode usar o LensLab normalmente, mas nada será salvo ao recarregar a
         página. Saia da navegação anônima ou libere os dados de site para este endereço.
       </p>

@@ -66,6 +66,13 @@
  */
 @theme {
   --animate-flutuar: flutuar 6s ease-in-out infinite;
+
+  /*
+   * Ponto de virada do menu do app: acima dele a navegação é uma barra,
+   * abaixo vira a gaveta lateral. Vale como variante (nav: e max-nav:).
+   * 861px para que "max-nav" cubra exatamente os antigos "max-width: 860px".
+   */
+  --breakpoint-nav: 861px;
 }
 
 /* Mockup de celular do hero: o rotate faz parte do repouso da animação. */
