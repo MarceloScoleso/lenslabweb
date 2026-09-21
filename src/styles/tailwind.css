@@ -115,6 +115,16 @@
   -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
 }
 
+/* Cabeçalho da página Sobre: mesma grade, brilho mais discreto. */
+@utility fundo-sobre {
+  background:
+    radial-gradient(680px 320px at 8% -20%, rgba(0, 200, 150, 0.14), transparent 65%),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 64px;
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+}
+
 /* Fundo do visor decorativo do painel. */
 @utility fundo-visor {
   background:
