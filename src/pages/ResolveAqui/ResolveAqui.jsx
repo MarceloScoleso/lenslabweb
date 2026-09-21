@@ -5,8 +5,7 @@ import { useMaterias } from '../../hooks/useMaterias.js'
 import { formatarDuracao, arredondar } from '../../utils/math-utils.js'
 import Icon from '../../components/Icon/Icon.jsx'
 import { MODOS } from '../../utils/modos-camera.js'
-import styles from './ResolveAqui.module.css'
-
+import { CONTAINER, BTN_PRIMARIO, BTN_SECUNDARIO, BTN_FANTASMA } from '../../styles/classes.js'
 
 /**
  * Tempo que o estudante escolhe para cada passo antes de começar.
@@ -20,6 +19,26 @@ const OPCOES_TEMPO = [
   { rotulo: '3 min', segundos: 180 },
   { rotulo: '5 min', segundos: 300 }
 ]
+
+const CARD = 'rounded-lg border border-line bg-surface p-[1.35rem] sm:p-8'
+const CARD_RESUMO = 'rounded-lg border border-line bg-surface p-[1.35rem] sm:p-7'
+
+const ROTULO =
+  'mb-3 block font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-ink-3'
+
+const CAMPO =
+  'w-full resize-y rounded-sm border border-line bg-white/[0.02] px-4 py-[0.9rem] text-[0.9375rem] leading-relaxed text-ink transition placeholder:text-ink-3 focus:border-accent/40 focus:shadow-[0_0_0_3px_var(--accent-06)] focus:outline-none'
+
+const AJUDA = 'mt-[0.55rem] block font-mono text-xs text-ink-3'
+
+/** Botão de escolha (matéria, tempo): muda só a pele quando ativo. */
+function classeEscolha(ativo, extra = '') {
+  return `rounded-sm border px-3 py-[0.7rem] transition ${extra} ${
+    ativo
+      ? 'border-accent/40 bg-accent/12 text-accent'
+      : 'border-line bg-white/[0.02] text-ink-2 hover:border-line-2 hover:bg-white/5 hover:text-ink'
+  }`
+}
 
 /**
  * ResolveAqui - Modo de resolução guiada
@@ -51,23 +70,29 @@ function ResolveAqui() {
   } = useResolveAqui(location.state?.fotoId || null)
 
   return (
-    <div className={styles.page}>
-      <section className={styles.header}>
-        <div className={styles.headerFundo} aria-hidden="true" />
-        <div className="container">
-          <div className={styles.headerConteudo}>
-            <span className={styles.eyebrow}>Modo Resolve Aqui</span>
-            <h1>Resolva com <span className={styles.highlight}>orientação</span>, não com a resposta pronta</h1>
-            <p>Fotografe seu exercício. O LensLab te guia passo a passo, respeitando seu raciocínio.</p>
-            <p className={styles.filosofia}>
+    <div className="min-h-[calc(100vh_-_var(--header-h))] bg-bg">
+      <section className="relative overflow-hidden border-b border-line pb-12 pt-14">
+        <div className="fundo-sobre pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className={CONTAINER}>
+          <div className="relative z-[1]">
+            <span className="mb-[1.15rem] inline-block rounded-full border border-accent/20 bg-accent/6 px-[0.7rem] py-[0.3rem] font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-accent">
+              Modo Resolve Aqui
+            </span>
+            <h1 className="mb-[0.85rem] max-w-[24ch] text-[clamp(1.85rem,4vw,2.6rem)] font-bold leading-[1.08] tracking-[-0.04em]">
+              Resolva com <span className="text-accent">orientação</span>, não com a resposta pronta
+            </h1>
+            <p className="max-w-[62ch] text-base leading-relaxed text-ink-2">
+              Fotografe seu exercício. O LensLab te guia passo a passo, respeitando seu raciocínio.
+            </p>
+            <p className="mt-[1.1rem] max-w-[62ch] border-l-2 border-accent/40 pl-[0.9rem] text-[0.9375rem] italic leading-relaxed text-ink-3">
               "Photomath responde, ChatGPT explica, LensLab ensina."
             </p>
           </div>
         </div>
       </section>
 
-      <section className={styles.content}>
-        <div className="container">
+      <section className="pb-18 pt-12">
+        <div className={CONTAINER}>
           {etapa === 'captura' && (
             <FormularioExercicio
               foto={foto}
@@ -122,39 +147,48 @@ function ResolveAqui() {
  */
 function FormularioExercicio({ foto, materias, erro, materia, setMateria, enunciado, setEnunciado, limiteSegundos, setLimiteSegundos, onEnviar }) {
   return (
-    <div className={styles.card}>
+    <div className={`mx-auto max-w-[680px] ${CARD}`}>
       {foto ? (
-        <div className={styles.cardTopo}>
-          <img src={foto.dataURL} alt="Exercício capturado" className={styles.fotoCapturada} />
+        <div className="mb-8">
+          <img
+            src={foto.dataURL}
+            alt="Exercício capturado"
+            className="mb-[1.35rem] max-h-[260px] w-full rounded-md border border-line object-cover"
+          />
           <ModoDaCaptura slug={foto.modoCaptura} />
-          <h2>Confirme o enunciado</h2>
-          <p className={styles.cardDescricao}>
+          <h2 className="mb-2 text-[1.35rem] tracking-[-0.03em] text-ink">Confirme o enunciado</h2>
+          <p className="text-[0.9375rem] leading-relaxed text-ink-2">
             Este é o exercício que você fotografou. Escolha a matéria e digite
             o enunciado que aparece na imagem.
           </p>
         </div>
       ) : (
-        <div className={styles.cardTopo}>
-          <span className={styles.cardIcone}>
+        <div className="mb-8">
+          <span className="mb-[1.1rem] grid h-[42px] w-[42px] place-items-center rounded-sm bg-accent/12 text-accent">
             <Icon nome="calculadora" tamanho={22} />
           </span>
-          <h2>Envie seu exercício</h2>
-          <p className={styles.cardDescricao}>
+          <h2 className="mb-2 text-[1.35rem] tracking-[-0.03em] text-ink">Envie seu exercício</h2>
+          <p className="text-[0.9375rem] leading-relaxed text-ink-2">
             Escolha a matéria e digite o enunciado, ou{' '}
-            <Link to="/camera" className={styles.linkCamera}>abra a câmera</Link>{' '}
+            <Link
+              to="/camera"
+              className="border-b border-accent/40 font-medium text-accent hover:border-accent"
+            >
+              abra a câmera
+            </Link>{' '}
             para fotografar o exercício.
           </p>
         </div>
       )}
 
-      <div className={styles.formGroup}>
-        <span className={styles.groupLabel}>Matéria</span>
-        <div className={styles.materiaGrid}>
+      <div className="mb-6">
+        <span className={ROTULO}>Matéria</span>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {materias.map(m => (
             <button
               key={m}
               type="button"
-              className={`${styles.materiaBtn} ${materia === m ? styles.materiaAtiva : ''}`}
+              className={classeEscolha(materia === m, 'text-sm font-medium')}
               onClick={() => setMateria(m)}
               aria-pressed={materia === m}
             >
@@ -164,29 +198,32 @@ function FormularioExercicio({ foto, materias, erro, materia, setMateria, enunci
         </div>
       </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="enunciado">Enunciado do exercício</label>
+      <div className="mb-6">
+        <label htmlFor="enunciado" className={ROTULO}>Enunciado do exercício</label>
         <textarea
           id="enunciado"
           value={enunciado}
           onChange={(e) => setEnunciado(e.target.value)}
           rows={5}
           placeholder="Ex: Calcule a velocidade final de um corpo em queda livre após 3 segundos, considerando g = 10 m/s²..."
-          className={styles.textarea}
+          className={CAMPO}
         />
-        <small className={styles.helperText}>
+        <small className={AJUDA}>
           {enunciado.length} caracteres (mínimo 10)
         </small>
       </div>
 
-      <div className={styles.formGroup}>
-        <span className={styles.groupLabel}>Tempo por passo</span>
-        <div className={styles.tempoGrid}>
+      <div className="mb-6">
+        <span className={ROTULO}>Tempo por passo</span>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
           {OPCOES_TEMPO.map(opcao => (
             <button
               key={opcao.rotulo}
               type="button"
-              className={`${styles.tempoBtn} ${limiteSegundos === opcao.segundos ? styles.tempoAtivo : ''}`}
+              className={classeEscolha(
+                limiteSegundos === opcao.segundos,
+                'font-mono text-[0.8125rem]'
+              )}
               onClick={() => setLimiteSegundos(opcao.segundos)}
               aria-pressed={limiteSegundos === opcao.segundos}
             >
@@ -194,7 +231,7 @@ function FormularioExercicio({ foto, materias, erro, materia, setMateria, enunci
             </button>
           ))}
         </div>
-        <small className={styles.helperText}>
+        <small className={AJUDA}>
           O cronômetro mede o seu ritmo em cada passo e nunca interrompe a
           resolução: se o tempo acabar, você continua de onde parou.
         </small>
@@ -208,7 +245,7 @@ function FormularioExercicio({ foto, materias, erro, materia, setMateria, enunci
 
       <button
         onClick={onEnviar}
-        className={`btn btn-primary ${styles.btnBloco}`}
+        className={`${BTN_PRIMARIO} w-full`}
         disabled={!materia || enunciado.length < 10}
       >
         <Icon nome="alvo" />
@@ -219,14 +256,22 @@ function FormularioExercicio({ foto, materias, erro, materia, setMateria, enunci
 }
 
 /**
- * ModoDaCaptura - filho: mostra em que modo da câmera a foto foi tirada
+ * ModoDaCaptura - filho: mostra em que modo da câmera a foto foi tirada.
+ * A cor vem do próprio modo (utils/modos-camera.js), por isso vai inline.
  */
 function ModoDaCaptura({ slug }) {
   const modo = slug && MODOS[slug]
   if (!modo || slug === 'foto') return null
 
   return (
-    <span className={styles.modoCaptura} style={{ '--tom-modo': modo.cor }}>
+    <span
+      className="mb-[0.9rem] inline-flex items-center gap-[0.4rem] rounded-full border px-[0.7rem] py-[0.3rem] font-mono text-[0.6875rem] tracking-[0.06em]"
+      style={{
+        color: modo.cor,
+        backgroundColor: `color-mix(in srgb, ${modo.cor} 12%, transparent)`,
+        borderColor: `color-mix(in srgb, ${modo.cor} 35%, transparent)`
+      }}
+    >
       <Icon nome={modo.icone} tamanho={14} />
       Capturado no modo {modo.nome}
     </span>
@@ -238,14 +283,16 @@ function ModoDaCaptura({ slug }) {
  */
 function TelaProcessando() {
   return (
-    <div className={`${styles.card} ${styles.processandoCard}`}>
-      <span className={styles.processandoIcone}>
+    <div className={`mx-auto max-w-[680px] text-center ${CARD} sm:px-8 sm:py-14`}>
+      <span className="animate-boiar mx-auto mb-[1.35rem] grid h-14 w-14 place-items-center rounded-md bg-accent/12 text-accent">
         <Icon nome="processador" tamanho={26} />
       </span>
-      <h2>Analisando o exercício...</h2>
-      <p className={styles.cardDescricao}>Identificando os passos ideais para você resolver.</p>
-      <div className={styles.progressBar}>
-        <div className={styles.progressFill}></div>
+      <h2 className="mb-2 text-[1.35rem] tracking-[-0.03em] text-ink">Analisando o exercício...</h2>
+      <p className="text-[0.9375rem] leading-relaxed text-ink-2">
+        Identificando os passos ideais para você resolver.
+      </p>
+      <div className="mx-auto mt-7 h-1 w-full max-w-[320px] overflow-hidden rounded-full bg-surface-3">
+        <div className="animate-progresso h-full rounded-full bg-gradient-to-r from-accent to-accent-hi" />
       </div>
     </div>
   )
@@ -287,7 +334,6 @@ function PassoAtual({ passo, numeroAtual, totalPassos, limiteSegundos, tempoProc
   const restante = limiteSegundos === null ? null : limiteSegundos - segundos
   const estourou = restante !== null && restante <= 0
   const atencao = restante !== null && !estourou && restante <= Math.max(10, Math.round(limiteSegundos * 0.2))
-  const estadoTempo = estourou ? 'estourado' : atencao ? 'atencao' : 'normal'
 
   const textoTempo = limiteSegundos === null
     ? formatarDuracao(segundos)
@@ -301,78 +347,101 @@ function PassoAtual({ passo, numeroAtual, totalPassos, limiteSegundos, tempoProc
       ? `Tempo do passo esgotado há ${formatarDuracao(segundos - limiteSegundos)}`
       : `Tempo restante neste passo: ${textoTempo}`
 
+  // Pele do cronômetro conforme o tempo aperta
+  let peleTempo = 'border-line bg-surface text-ink-3'
+  let peleValor = 'text-ink'
+  if (atencao) {
+    peleTempo = 'border-warning/35 bg-warning/8 text-warning'
+    peleValor = 'text-warning'
+  }
+  if (estourou) {
+    peleTempo = 'border-danger/35 bg-danger/8 text-danger'
+    peleValor = 'text-danger'
+  }
+
   return (
-    <div className={styles.passoContainer}>
+    <div className="mx-auto max-w-[760px]">
       {/* A promessa dos 30 segundos vale para os dois modos: aqui ela
           aparece no instante em que a resolução fica pronta. */}
       {numeroAtual === 1 && tempoProcessamento > 0 && (
-        <p className={styles.geracaoBanner}>
+        <p className="mb-[0.85rem] flex flex-wrap items-center gap-2 rounded-sm border border-accent/20 bg-accent/6 px-[0.9rem] py-[0.6rem] text-[0.8125rem] text-ink-2 [&>svg]:text-accent">
           <Icon nome="raio" tamanho={15} />
-          Resolução preparada em <strong>{arredondar(tempoProcessamento / 1000, 1)}s</strong>
-          <span>bem abaixo da meta de 30 segundos</span>
+          Resolução preparada em{' '}
+          <strong className="font-mono font-medium text-accent">
+            {arredondar(tempoProcessamento / 1000, 1)}s
+          </strong>
+          <span className="text-xs text-ink-3">bem abaixo da meta de 30 segundos</span>
         </p>
       )}
 
-      <div className={styles.passoHeader}>
-        <span className={styles.passoNumero}>Passo {numeroAtual} de {totalPassos}</span>
-        <div className={styles.medidores}>
+      <div className="mb-[0.85rem] flex flex-col flex-wrap items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <span className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-accent">
+          Passo {numeroAtual} de {totalPassos}
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
           <div
-            className={styles.cronometro}
-            data-estado={estadoTempo}
+            className={`inline-flex items-center gap-[0.45rem] rounded-full border px-[0.8rem] py-[0.35rem] text-[0.8125rem] transition ${peleTempo}`}
             role="timer"
             aria-label={rotuloTempo}
             title={rotuloTempo}
           >
             <Icon nome="relogio" tamanho={15} />
-            <strong>{textoTempo}</strong>
-            {estourou && <span className={styles.esgotado}>esgotado</span>}
+            <strong className={`font-mono text-[0.8125rem] font-medium tabular-nums ${peleValor}`}>
+              {textoTempo}
+            </strong>
+            {estourou && (
+              <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em]">esgotado</span>
+            )}
           </div>
-          <div className={styles.dicasCounter}>
+          <div className="inline-flex items-center gap-[0.45rem] rounded-full border border-line bg-surface px-[0.8rem] py-[0.35rem] text-[0.8125rem] text-ink-3 [&>svg]:text-warning">
             <Icon nome="dica" tamanho={15} />
-            Dicas restantes <strong>{dicasRestantes}</strong>
+            Dicas restantes{' '}
+            <strong className="font-mono text-[0.8125rem] text-ink">{dicasRestantes}</strong>
           </div>
         </div>
       </div>
 
-      <div className={styles.passoProgressBar}>
+      <div className="mb-6 h-[3px] overflow-hidden rounded-full bg-surface-3">
         <div
-          className={styles.passoProgressFill}
+          className="h-full rounded-full bg-gradient-to-r from-accent to-accent-hi transition-[width] duration-[400ms]"
           style={{ width: `${(numeroAtual / totalPassos) * 100}%` }}
         />
       </div>
 
-      <div className={styles.passoCard}>
-        <h2>{passo.titulo}</h2>
-        <p className={styles.passoDescricao}>{passo.descricao}</p>
+      <div className={CARD}>
+        <h2 className="mb-3 text-[1.3rem] tracking-[-0.03em] text-ink">{passo.titulo}</h2>
+        <p className="mb-6 text-[0.9875rem] leading-[1.65] text-ink-2">{passo.descricao}</p>
 
         {dicaVisivel && (
-          <div className={styles.dicaBox}>
-            <span className={styles.dicaIcone}>
+          <div className="animate-surgir mb-6 flex items-start gap-[0.9rem] rounded-md border border-warning/25 bg-warning/7 px-[1.2rem] py-[1.1rem]">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xs bg-warning/14 text-warning">
               <Icon nome="dica" tamanho={17} />
             </span>
             <div>
-              <strong>Dica</strong>
-              <p>{passo.dica}</p>
+              <strong className="mb-[0.3rem] block font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-warning">
+                Dica
+              </strong>
+              <p className="text-[0.9375rem] leading-relaxed text-ink-2">{passo.dica}</p>
             </div>
           </div>
         )}
 
-        <div className={styles.acaoGroup}>
-          <label htmlFor="acao">O que você faria agora?</label>
+        <div className="mb-6">
+          <label htmlFor="acao" className={ROTULO}>O que você faria agora?</label>
           <textarea
             id="acao"
             value={acao}
             onChange={(e) => setAcao(e.target.value)}
             rows={3}
             placeholder="Descreva sua abordagem para este passo..."
-            className={styles.acaoInput}
+            className={CAMPO}
           />
         </div>
 
-        <div className={styles.passoAcoes}>
+        <div className="flex flex-col-reverse flex-wrap justify-between gap-3 sm:flex-row [&>*]:w-full sm:[&>*]:w-auto">
           <button
             onClick={pedirDica}
-            className="btn btn-secondary"
+            className={BTN_SECUNDARIO}
             disabled={dicasRestantes === 0 || dicaVisivel}
           >
             <Icon nome="dica" />
@@ -381,7 +450,7 @@ function PassoAtual({ passo, numeroAtual, totalPassos, limiteSegundos, tempoProc
 
           <button
             onClick={confirmar}
-            className="btn btn-primary"
+            className={BTN_PRIMARIO}
             disabled={acao.trim().length < 3}
           >
             {numeroAtual === totalPassos ? 'Finalizar' : 'Próximo passo'}
@@ -399,77 +468,90 @@ function PassoAtual({ passo, numeroAtual, totalPassos, limiteSegundos, tempoProc
 function ResultadoFinal({ materia, acoesUsuario, dicasUsadas, limiteSegundos, totalPassos, onSalvar, onReiniciar }) {
   const tempoTotal = somarTempos(acoesUsuario)
 
+  const resumo = [
+    { id: 'materia', icone: 'livro', rotulo: 'Matéria', valor: materia },
+    { id: 'passos', icone: 'check', rotulo: 'Passos concluídos', valor: totalPassos },
+    { id: 'dicas', icone: 'dica', rotulo: 'Dicas usadas', valor: `${dicasUsadas} de 3` },
+    { id: 'tempo', icone: 'relogio', rotulo: 'Tempo total', valor: formatarDuracao(tempoTotal) },
+    {
+      id: 'limite',
+      icone: 'alvo',
+      rotulo: 'Tempo por passo',
+      valor: limiteSegundos === null ? 'Sem limite' : formatarDuracao(limiteSegundos)
+    }
+  ]
+
   return (
-    <div className={styles.resultadoContainer}>
-      <div className={styles.parabens}>
-        <span className={styles.parabensIcone}>
+    <div className="mx-auto flex max-w-[680px] flex-col gap-4">
+      <div className="fundo-placar-bom rounded-lg border border-accent/20 p-[1.35rem] text-center sm:px-8 sm:py-9">
+        <span className="mx-auto mb-[1.1rem] grid h-[52px] w-[52px] place-items-center rounded-md bg-accent/12 text-accent">
           <Icon nome="medalha" tamanho={24} />
         </span>
-        <h2>Você concluiu todos os passos</h2>
-        <p>Agora chegou a hora de conferir sua resposta.</p>
+        <h2 className="mb-[0.4rem] text-[1.35rem] tracking-[-0.03em] text-ink">
+          Você concluiu todos os passos
+        </h2>
+        <p className="text-[0.9375rem] text-ink-2">Agora chegou a hora de conferir sua resposta.</p>
       </div>
 
-      <div className={styles.resumoCard}>
-        <h3>Resumo da sua sessão</h3>
-        <ul className={styles.resumoLista}>
-          <li>
-            <span><Icon nome="livro" tamanho={16} /> Matéria</span>
-            <strong>{materia}</strong>
-          </li>
-          <li>
-            <span><Icon nome="check" tamanho={16} /> Passos concluídos</span>
-            <strong>{totalPassos}</strong>
-          </li>
-          <li>
-            <span><Icon nome="dica" tamanho={16} /> Dicas usadas</span>
-            <strong>{dicasUsadas} de 3</strong>
-          </li>
-          <li>
-            <span><Icon nome="relogio" tamanho={16} /> Tempo total</span>
-            <strong>{formatarDuracao(tempoTotal)}</strong>
-          </li>
-          <li>
-            <span><Icon nome="alvo" tamanho={16} /> Tempo por passo</span>
-            <strong>
-              {limiteSegundos === null ? 'Sem limite' : formatarDuracao(limiteSegundos)}
-            </strong>
-          </li>
+      <div className={CARD_RESUMO}>
+        <h3 className="mb-[1.1rem] text-base tracking-[-0.02em] text-ink">Resumo da sua sessão</h3>
+        <ul className="flex flex-col gap-2">
+          {resumo.map(linha => (
+            <li
+              key={linha.id}
+              className="flex items-center justify-between gap-4 rounded-sm border border-line bg-white/[0.02] px-4 py-3"
+            >
+              <span className="inline-flex items-center gap-[0.55rem] text-[0.9rem] text-ink-2 [&>svg]:text-ink-3">
+                <Icon nome={linha.icone} tamanho={16} /> {linha.rotulo}
+              </span>
+              <strong className="text-[0.9rem] font-semibold text-ink">{linha.valor}</strong>
+            </li>
+          ))}
         </ul>
       </div>
 
-      <div className={styles.acoesRegistradas}>
-        <h4>Suas ações passo a passo</h4>
-        <ol>
+      <div className={CARD_RESUMO}>
+        <h4 className="mb-[1.1rem] text-base tracking-[-0.02em] text-ink">Suas ações passo a passo</h4>
+        <ol className="flex flex-col gap-[0.15rem]">
           {acoesUsuario.map((a, i) => (
-            <li key={i}>
-              <span className={styles.acaoNumero}>{String(a.passo).padStart(2, '0')}</span>
-              <p>{a.acao}</p>
-              <span className={styles.acaoTempo}>{formatarDuracao(a.segundos || 0)}</span>
+            <li
+              key={i}
+              className="flex gap-[0.85rem] border-b border-line py-[0.65rem] last:border-b-0 last:pb-0"
+            >
+              <span className="shrink-0 pt-[0.15rem] font-mono text-xs text-accent">
+                {String(a.passo).padStart(2, '0')}
+              </span>
+              <p className="flex-1 text-[0.9375rem] leading-[1.55] text-ink-2">{a.acao}</p>
+              <span className="shrink-0 pt-[0.15rem] font-mono text-xs text-ink-3">
+                {formatarDuracao(a.segundos || 0)}
+              </span>
             </li>
           ))}
         </ol>
       </div>
 
-      <div className={styles.conferenciaBox}>
-        <h3>Sua resposta bateu com o gabarito?</h3>
-        <p>
+      <div className="rounded-lg border border-accent/20 bg-surface p-[1.35rem] text-center sm:p-7">
+        <h3 className="mb-2 text-[1.1rem] tracking-[-0.025em] text-ink">
+          Sua resposta bateu com o gabarito?
+        </h3>
+        <p className="mb-6 text-[0.9rem] leading-relaxed text-ink-2">
           Em produção, o LensLab compararia sua resposta com a correta automaticamente.
           Por enquanto, você confirma o resultado.
         </p>
-        <div className={styles.conferenciaAcoes}>
-          <button onClick={() => onSalvar(true)} className="btn btn-primary">
+        <div className="flex flex-col-reverse flex-wrap justify-center gap-3 sm:flex-row [&>*]:w-full sm:[&>*]:w-auto">
+          <button onClick={() => onSalvar(true)} className={BTN_PRIMARIO}>
             <Icon nome="checkCircle" />
             Sim, acertei
           </button>
-          <button onClick={() => onSalvar(false)} className="btn btn-secondary">
+          <button onClick={() => onSalvar(false)} className={BTN_SECUNDARIO}>
             <Icon nome="xCircle" />
             Não, preciso revisar
           </button>
         </div>
       </div>
 
-      <div className={styles.acoesFinais}>
-        <button onClick={onReiniciar} className="btn btn-ghost">
+      <div className="pt-1 text-center">
+        <button onClick={onReiniciar} className={BTN_FANTASMA}>
           <Icon nome="girar" />
           Resolver outro exercício
         </button>
