@@ -58,3 +58,23 @@
   --shadow-glow: var(--glow);
   --shadow-card: var(--shadow-md);
 }
+
+/*
+ * Animações que o Tailwind não traz prontas.
+ * Ficam aqui, expostas como utilitários (animate-flutuar), em vez de
+ * virarem CSS solto em algum componente.
+ */
+@theme {
+  --animate-flutuar: flutuar 6s ease-in-out infinite;
+}
+
+/* Mockup de celular do hero: o rotate faz parte do repouso da animação. */
+@keyframes flutuar {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-3deg) translateY(-15px);
+  }
+}
