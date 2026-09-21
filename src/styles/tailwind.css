@@ -1,0 +1,51 @@
+/*
+ * tailwind.css
+ * Entrada do Tailwind CSS v4 e ponte com os tokens do LensLab.
+ *
+ * Os valores continuam definidos uma única vez, em global.css (:root).
+ * O bloco @theme inline apenas expõe esses tokens como utilitários do
+ * Tailwind, então bg-surface, text-accent, border-line e afins usam
+ * exatamente as mesmas cores do resto da aplicação.
+ */
+@import "tailwindcss";
+
+@theme inline {
+  /* Superfícies */
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+
+  /* Linhas */
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+
+  /* Texto */
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-ink-3: var(--text-3);
+
+  /* Marca e estados */
+  --color-accent: var(--accent);
+  --color-accent-hi: var(--accent-hi);
+  --color-info: var(--info);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  /* Tipografia */
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  /* Raios */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Sombras */
+  --shadow-glow: var(--glow);
+  --shadow-card: var(--shadow-md);
+}
