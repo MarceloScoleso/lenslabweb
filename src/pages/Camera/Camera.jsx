@@ -21,6 +21,13 @@ import {
  */
 const CHASSI = 'bg-[#050807]'
 
+/** Para onde cada destino leva a foto recém-capturada. */
+const ROTAS_DESTINO = {
+  estuda: '/estuda-comigo',
+  resolve: '/resolve-aqui',
+  privacidade: '/privacidade'
+}
+
 /** Botão redondo de vidro fosco sobre o visor (flash, grade, timer). */
 const CTRL =
   'relative grid h-9 w-9 place-items-center rounded-full border backdrop-blur-[8px] transition'
@@ -175,11 +182,14 @@ function Camera() {
     setSalvando(true)
     setErroSalvar(null)
     try {
+      // A foto que vai para a Privacidade ainda não está protegida, então
+      // é gravada como captura comum: o modo 'privacidade' fica reservado
+      // para o resultado já desfocado, salvo pela própria tela do modo.
+      const modoDaFoto = paraOnde === 'privacidade' ? 'foto' : paraOnde
+
       // O modo da câmera segue junto com a foto para a tela do modo de estudo
-      const foto = await salvar(imagem, paraOnde, { modoCaptura: modo })
-      navigate(paraOnde === 'estuda' ? '/estuda-comigo' : '/resolve-aqui', {
-        state: { fotoId: foto.id }
-      })
+      const foto = await salvar(imagem, modoDaFoto, { modoCaptura: modo })
+      navigate(ROTAS_DESTINO[paraOnde], { state: { fotoId: foto.id } })
     } catch (e) {
       console.error('[câmera] Erro ao salvar:', e)
       setErroSalvar(e.message || 'Não foi possível salvar a foto.')
@@ -618,6 +628,14 @@ function EscolhaDestino({ salvando, erro, onEscolher, onRefazer }) {
         titulo="Resolve Aqui"
         descricao="Resolução guiada passo a passo"
         onClick={() => onEscolher('resolve')}
+        desabilitado={salvando}
+      />
+
+      <BotaoDestino
+        icone="usuarios"
+        titulo="Proteger rostos"
+        descricao="Desfocar rostos antes de postar"
+        onClick={() => onEscolher('privacidade')}
         desabilitado={salvando}
       />
 

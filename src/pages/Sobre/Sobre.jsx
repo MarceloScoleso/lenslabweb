@@ -93,8 +93,8 @@ function Sobre() {
                 <strong> praticar exercícios</strong> e <strong>compartilhar com privacidade</strong>.
               </p>
               <p className="border-l-2 border-line-2 pl-[0.85rem] text-sm text-ink-3">
-                Neste protótipo estão implementados os dois primeiros — Estuda Comigo
-                e Resolve Aqui. O modo de privacidade é o escopo da próxima sprint.
+                Os três estão implementados neste protótipo: Estuda Comigo e Resolve
+                Aqui desde a Sprint 3, e o Modo Privacidade Estudante nesta Sprint 4.
               </p>
             </article>
 

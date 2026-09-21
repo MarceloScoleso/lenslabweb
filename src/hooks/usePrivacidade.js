@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { detectarRostos, renderizarComDesfoque } from '../utils/rostos.js'
-import { salvar, lerLista } from '../services/photos.js'
+import { salvar, lerLista, obter } from '../services/photos.js'
 import { gerarId } from '../utils/math-utils.js'
 import { useHistorico } from './useHistorico.js'
+import { useLocalStorage } from './useLocalStorage.js'
 
 const TAMANHO_MANUAL = 0.16 // largura da região criada por toque, em fração da imagem
 
@@ -14,9 +15,14 @@ const TAMANHO_MANUAL = 0.16 // largura da região criada por toque, em fração 
  *
  * Por padrão todos os rostos começam DESFOCADOS: é mais seguro o estudante
  * escolher quem revelar do que esquecer alguém exposto.
+ *
+ * @param {string|null} fotoIdInicial - id de uma foto já capturada. Vem da
+ *   câmera, quando o estudante escolhe "Proteger rostos" logo depois da
+ *   captura: a tela abre já com aquela foto, sem passar pela seleção.
  */
-export function usePrivacidade() {
+export function usePrivacidade(fotoIdInicial = null) {
   const { registrar } = useHistorico()
+  const [, setProtegidas] = useLocalStorage('lenslab_protegidas', [])
 
   const [fonte, setFonte] = useState(null)            // dataURL ou caminho da imagem original
   const [regioes, setRegioes] = useState([])
@@ -75,6 +81,18 @@ export function usePrivacidade() {
     setEstado('pronto')
   }
 
+  // Abre sozinha a foto que veio da câmera. O ref garante uma vez só por
+  // id, já que escolherImagem é recriada a cada render.
+  const fotoJaAberta = useRef(null)
+  useEffect(() => {
+    if (!fotoIdInicial || fotoJaAberta.current === fotoIdInicial) return
+    fotoJaAberta.current = fotoIdInicial
+
+    const foto = obter(fotoIdInicial)
+    if (foto) escolherImagem(foto.dataURL)
+    else setAviso('A foto capturada não foi encontrada. Escolha uma imagem abaixo.')
+  }, [fotoIdInicial]) // eslint-disable-line react-hooks/exhaustive-deps
+
   function aoEnviarArquivo(evento) {
     const arquivo = evento.target.files?.[0]
     evento.target.value = ''
@@ -127,6 +145,23 @@ export function usePrivacidade() {
     try {
       const foto = await salvar(dataURL, 'privacidade')
       const quantos = regioes.filter(r => r.borrar).length
+
+      // A foto protegida também vira um item da Galeria, ao lado dos
+      // materiais e dos exercícios, para poder ser filtrada e removida
+      // pelos mesmos caminhos.
+      setProtegidas(atual => [{
+        id: gerarId('protegida'),
+        fotoId: foto.id,
+        materia: null,
+        contexto: quantos === 1
+          ? '1 rosto desfocado antes de compartilhar.'
+          : `${quantos} rostos desfocados antes de compartilhar.`,
+        rostosDesfocados: quantos,
+        totalRostos: regioes.length,
+        intensidade,
+        timestamp: Date.now()
+      }, ...atual])
+
       registrar('criado', `Foto protegida salva com ${quantos} ${quantos === 1 ? 'rosto desfocado' : 'rostos desfocados'}`)
       return foto
     } finally {

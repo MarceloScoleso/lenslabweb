@@ -23,6 +23,12 @@ const ATALHOS = [
     icone: 'calculadora',
     titulo: 'Resolve Aqui',
     texto: 'Foto do exercício vira uma resolução guiada passo a passo.'
+  },
+  {
+    to: '/privacidade',
+    icone: 'usuarios',
+    titulo: 'Modo Privacidade',
+    texto: 'Desfoque os rostos, um por um, antes de postar a foto da turma.'
   }
 ]
 

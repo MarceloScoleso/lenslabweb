@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { usePrivacidade } from '../../hooks/usePrivacidade.js'
 
 /**
@@ -19,7 +19,9 @@ import { usePrivacidade } from '../../hooks/usePrivacidade.js'
  */
 function Privacidade() {
   const navigate = useNavigate()
-  const p = usePrivacidade()
+  const location = useLocation()
+  // A camera manda a foto recem-capturada por aqui
+  const p = usePrivacidade(location.state?.fotoId || null)
   const [mensagem, setMensagem] = useState('')
 
   async function salvar() {

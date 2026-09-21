@@ -14,7 +14,43 @@ import { CONTAINER, BTN_PRIMARIO } from '../../styles/classes.js'
 const TONS = {
   nota: { filete: 'bg-accent', icone: 'text-accent' },
   exercicio: { filete: 'bg-info', icone: 'text-info' },
+  privacidade: { filete: 'bg-warning', icone: 'text-warning' },
   removido: { filete: 'bg-danger', icone: 'text-danger' }
+}
+
+/**
+ * Os três tipos de item que convivem na galeria. O `titulo` é o que
+ * aparece como nome do card: materiais e exercícios usam a matéria, e a
+ * foto protegida não tem matéria nenhuma, então usa o próprio rótulo.
+ */
+const TIPOS = {
+  nota: {
+    rotulo: 'Material',
+    tag: 'Material de estudo',
+    icone: 'livro',
+    tom: TONS.nota,
+    chave: 'notas'
+  },
+  exercicio: {
+    rotulo: 'Exercício',
+    tag: 'Exercício',
+    icone: 'calculadora',
+    tom: TONS.exercicio,
+    chave: 'exercicios'
+  },
+  privacidade: {
+    rotulo: 'Foto protegida',
+    tag: 'Privacidade',
+    icone: 'usuarios',
+    tom: TONS.privacidade,
+    chave: 'protegidas'
+  }
+}
+
+/** "Material de Química", "Foto protegida" — usado nas linhas do histórico. */
+function descrever(item) {
+  const tipo = TIPOS[item.tipo] ?? TIPOS.nota
+  return item.materia ? `${tipo.rotulo} de ${item.materia}` : tipo.rotulo
 }
 
 /** Moldura comum aos cards de item, da galeria e da lixeira. */
@@ -46,8 +82,17 @@ const LINHA_RECURSO = 'flex items-center gap-[0.55rem] text-[0.8125rem] text-ink
 function Galeria() {
   const [notas, setNotas] = useLocalStorage('lenslab_notas', [])
   const [exercicios, setExercicios] = useLocalStorage('lenslab_exercicios', [])
+  const [protegidas, setProtegidas] = useLocalStorage('lenslab_protegidas', [])
   const [lixeira, setLixeira] = useLocalStorage('lenslab_lixeira', [])
   const { historico, registrar } = useHistorico()
+
+  // Uma lista por tipo, para que remover e restaurar funcionem igual
+  // para materiais, exercícios e fotos protegidas.
+  const LISTAS = {
+    nota: [notas, setNotas],
+    exercicio: [exercicios, setExercicios],
+    privacidade: [protegidas, setProtegidas]
+  }
 
   const [busca, setBusca] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('todos')
@@ -59,20 +104,24 @@ function Galeria() {
     const mapa = {}
     lerLista().forEach(f => { mapa[f.id] = f })
     return mapa
-  }, [notas, exercicios, lixeira])
+  }, [notas, exercicios, protegidas, lixeira])
 
   const todosItens = useMemo(() => {
     const items = [
       ...notas.map(n => ({ ...n, tipo: 'nota' })),
-      ...exercicios.map(e => ({ ...e, tipo: 'exercicio' }))
+      ...exercicios.map(e => ({ ...e, tipo: 'exercicio' })),
+      ...protegidas.map(p => ({ ...p, tipo: 'privacidade' }))
     ]
     return items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-  }, [notas, exercicios])
+  }, [notas, exercicios, protegidas])
 
   const itensFiltrados = useMemo(() => {
     return todosItens.filter(item => {
       if (filtroTipo === 'notas' && item.tipo !== 'nota') return false
       if (filtroTipo === 'exercicios' && item.tipo !== 'exercicio') return false
+      if (filtroTipo === 'privacidade' && item.tipo !== 'privacidade') return false
+      // Fotos protegidas não têm matéria, então saem de cena assim que o
+      // estudante filtra por uma matéria específica.
       if (filtroMateria !== 'todas' && item.materia !== filtroMateria) return false
 
       if (busca) {
@@ -102,24 +151,18 @@ function Galeria() {
   const exemplosCarregados = todosItens.some(i => i.exemplo) || lixeira.some(i => i.exemplo)
 
   function moverParaLixeira(item) {
-    if (item.tipo === 'nota') {
-      setNotas(notas.filter(n => n.id !== item.id))
-    } else {
-      setExercicios(exercicios.filter(e => e.id !== item.id))
-    }
+    const [lista, definir] = LISTAS[item.tipo] ?? LISTAS.exercicio
+    definir(lista.filter(i => i.id !== item.id))
     setLixeira([{ ...item, removidoEm: Date.now() }, ...lixeira])
-    registrar('removido', `${rotulo(item)} de ${item.materia} foi para a lixeira`)
+    registrar('removido', `${descrever(item)} foi para a lixeira`)
   }
 
   function restaurar(item) {
     const { removidoEm, ...limpo } = item
-    if (item.tipo === 'nota') {
-      setNotas([limpo, ...notas])
-    } else {
-      setExercicios([limpo, ...exercicios])
-    }
+    const [lista, definir] = LISTAS[item.tipo] ?? LISTAS.exercicio
+    definir([limpo, ...lista])
     setLixeira(lixeira.filter(i => i.id !== item.id))
-    registrar('restaurado', `${rotulo(item)} de ${item.materia} foi restaurado`)
+    registrar('restaurado', `${descrever(item)} foi restaurado`)
   }
 
   function excluirDefinitivo(item) {
@@ -131,7 +174,7 @@ function Galeria() {
     if (item.fotoId) excluirFoto(item.fotoId)
 
     setLixeira(lixeira.filter(i => i.id !== item.id))
-    registrar('excluido', `${rotulo(item)} de ${item.materia} foi excluído em definitivo`)
+    registrar('excluido', `${descrever(item)} foi excluído em definitivo`)
   }
 
   function carregarExemplos() {
@@ -241,6 +284,7 @@ function Galeria() {
                     <option value="todos">Todos os tipos</option>
                     <option value="notas">Só materiais</option>
                     <option value="exercicios">Só exercícios</option>
+                    <option value="privacidade">Só fotos protegidas</option>
                   </select>
 
                   <label className="sr-only" htmlFor="filtroMateria">Filtrar por matéria</label>
@@ -345,9 +389,6 @@ function Galeria() {
   )
 }
 
-function rotulo(item) {
-  return item.tipo === 'nota' ? 'Material' : 'Exercício'
-}
 
 /**
  * ItemCard - filho: card de um material ou exercício ativo
@@ -356,8 +397,9 @@ function ItemCard({ item, foto, onRemover }) {
   const [expandido, setExpandido] = useState(false)
 
   const ehNota = item.tipo === 'nota'
-  const tag = ehNota ? 'Material de estudo' : 'Exercício'
-  const tom = ehNota ? TONS.nota : TONS.exercicio
+  const ehPrivacidade = item.tipo === 'privacidade'
+  const tipo = TIPOS[item.tipo] ?? TIPOS.exercicio
+  const tom = tipo.tom
 
   // Só as capturas reais são base64; as imagens do seed são caminhos de
   // arquivo e não têm um tamanho que faça sentido exibir.
@@ -385,18 +427,18 @@ function ItemCard({ item, foto, onRemover }) {
 
       <div className="flex items-start gap-3">
         <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xs bg-white/5 ${tom.icone}`}>
-          <Icon nome={ehNota ? 'livro' : 'calculadora'} tamanho={17} />
+          <Icon nome={tipo.icone} tamanho={17} />
         </span>
         <div className="min-w-0 flex-1">
           <span className="mb-1 block font-mono text-[0.625rem] uppercase tracking-[0.12em] text-ink-3">
-            {tag}
+            {tipo.tag}
           </span>
-          <h3 className="text-base tracking-[-0.02em] text-ink">{item.materia}</h3>
+          <h3 className="text-base tracking-[-0.02em] text-ink">{item.materia || tipo.rotulo}</h3>
         </div>
         <button
           className="grid h-[30px] w-[30px] place-items-center rounded-xs text-ink-3 transition hover:bg-danger/10 hover:text-danger"
           onClick={() => onRemover(item)}
-          aria-label={`Mover ${tag.toLowerCase()} de ${item.materia} para a lixeira`}
+          aria-label={`Mover ${descrever(item).toLowerCase()} para a lixeira`}
           title="Mover para a lixeira"
         >
           <Icon nome="lixeira" tamanho={16} />
@@ -441,7 +483,28 @@ function ItemCard({ item, foto, onRemover }) {
               </>
             )}
 
-            {!ehNota && (
+            {ehPrivacidade && (
+              <>
+                <div className={LINHA_RECURSO}>
+                  <Icon nome="usuarios" tamanho={15} />
+                  <span>Rostos desfocados</span>
+                  <strong className="ml-auto font-semibold text-ink">
+                    {item.rostosDesfocados ?? 0} de {item.totalRostos ?? 0}
+                  </strong>
+                </div>
+                {item.intensidade != null && (
+                  <div className={LINHA_RECURSO}>
+                    <Icon nome="brilho" tamanho={15} />
+                    <span>Intensidade do desfoque</span>
+                    <strong className="ml-auto font-semibold text-ink">
+                      {item.intensidade}/10
+                    </strong>
+                  </div>
+                )}
+              </>
+            )}
+
+            {item.tipo === 'exercicio' && (
               <>
                 <div className={LINHA_RECURSO}>
                   <Icon nome="grafico" tamanho={15} />
@@ -524,13 +587,15 @@ function ItemLixeira({ item, onRestaurar, onExcluir }) {
 
       <div className="flex items-start gap-3">
         <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xs bg-white/5 ${TONS.removido.icone}`}>
-          <Icon nome={item.tipo === 'nota' ? 'livro' : 'calculadora'} tamanho={17} />
+          <Icon nome={(TIPOS[item.tipo] ?? TIPOS.exercicio).icone} tamanho={17} />
         </span>
         <div className="min-w-0 flex-1">
           <span className="mb-1 block font-mono text-[0.625rem] uppercase tracking-[0.12em] text-ink-3">
-            {rotulo(item)} removido
+            {(TIPOS[item.tipo] ?? TIPOS.exercicio).rotulo} removido
           </span>
-          <h3 className="text-base tracking-[-0.02em] text-ink">{item.materia}</h3>
+          <h3 className="text-base tracking-[-0.02em] text-ink">
+            {item.materia || (TIPOS[item.tipo] ?? TIPOS.exercicio).rotulo}
+          </h3>
         </div>
       </div>
 
