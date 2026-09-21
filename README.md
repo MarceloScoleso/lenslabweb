@@ -20,6 +20,9 @@ Este projeto é a migração para React do protótipo HTML/CSS/JS entregue na Sp
 - [Migração a partir do protótipo da Sprint 2](#migração-a-partir-do-protótipo-da-sprint-2)
 - [Uso de localStorage](#uso-de-localstorage)
 - [Uso de Math](#uso-de-math)
+- [API própria](#api-própria)
+- [Rotas públicas e privadas](#rotas-públicas-e-privadas)
+- [Hooks customizados](#hooks-customizados)
 - [Uso de IA no projeto](#uso-de-ia-no-projeto)
 - [Deploy na Vercel](#deploy-na-vercel)
 - [Integrantes](#integrantes)
@@ -33,13 +36,15 @@ Este projeto é a migração para React do protótipo HTML/CSS/JS entregue na Sp
 | **React** | 18.3.1 | Biblioteca principal de UI |
 | **React Router DOM** | 6.26.2 | Roteamento entre páginas |
 | **Vite** | 5.4.8 | Build tool e servidor de desenvolvimento |
-| **CSS Modules** | nativo do Vite | Estilização com encapsulamento por componente |
+| **Tailwind CSS** | 4.x | Estilização por utilitários, integrada aos tokens de cor do projeto |
+| **Funções serverless da Vercel** | Node.js | API própria do projeto (pasta `api/`) |
+| **MediaPipe Tasks Vision** | 1.0.1 | Detecção de rostos no Modo Privacidade Estudante |
 | **localStorage API** | nativa do navegador | Persistência de dados entre sessões |
 | **MediaDevices (getUserMedia)** | nativa do navegador | Acesso à webcam na tela de câmera |
 | **Canvas API** | nativa do navegador | Captura, filtros dos modos, recorte e compressão da foto |
 | **Web Audio API** | nativa do navegador | Som do obturador sintetizado na captura |
 
-Não foram usadas bibliotecas de UI (Material, Tailwind, Bootstrap). Todo o design foi construído em CSS puro com CSS Modules, seguindo a identidade visual do produto LensLab.
+A estilização usa **Tailwind CSS**. As cores, fontes, raios e sombras do LensLab são definidos uma única vez em `src/styles/global.css` e expostos ao Tailwind pelo bloco `@theme` de `src/styles/tailwind.css`, então classes como `bg-surface`, `text-accent` e `border-line` usam exatamente a identidade visual do produto. Não foram usadas bibliotecas de componentes prontos (Material, Bootstrap, shadcn).
 
 ---
 
@@ -84,7 +89,29 @@ O `build` gera os arquivos otimizados na pasta `dist/`. O `preview` sobe um serv
 
 ### Usuários e senhas
 
-**Não há autenticação no projeto.** Não são necessários usuário nem senha para testar. A aplicação é de acesso livre e usa `localStorage` para guardar os dados no próprio navegador.
+A aplicação tem autenticação. As páginas públicas (início, sobre e login) abrem sem conta; todo o resto exige login.
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Estudante | `estudante@lenslab.com` | `lenslab123` |
+| Avaliador | `professor@lenslab.com` | `fiap2026` |
+
+Na tela de login há um botão **"Preencher automaticamente"** que completa os dados do usuário de teste.
+
+### Servidor da API (back-end)
+
+O projeto tem uma API própria, na pasta `api/`, mas **não é preciso subir nenhum servidor separado**:
+
+- **Em desenvolvimento**, o `npm run dev` já serve a API junto com o front, pelo plugin `dev/api-local.js`. As rotas respondem em `http://localhost:3000/api/...`.
+- **Em produção**, a Vercel transforma cada arquivo de `api/` em uma função serverless automaticamente no deploy.
+
+O mesmo código roda nos dois ambientes. Para testar a API isoladamente, com o `npm run dev` rodando:
+
+```bash
+curl http://localhost:3000/api/materias
+```
+
+Opcionalmente, defina a variável de ambiente `LENSLAB_SECRET` (usada para assinar os tokens de sessão). Sem ela, é usado um valor padrão, suficiente para avaliação.
 
 ### Roteiro rápido de teste
 
@@ -236,13 +263,70 @@ O arquivo `src/utils/math-utils.js` reúne as funções que utilizam o objeto `M
 
 ---
 
+## API própria
+
+A API é composta por funções serverless da Vercel, na pasta `api/`. Todas respondem JSON.
+
+| Método | Rota | Acesso | O que faz |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | Pública | Recebe `{ email, senha }` e devolve `{ token, usuario }` |
+| `GET` | `/api/auth/me` | Privada | Valida o token e devolve o usuário da sessão |
+| `GET` | `/api/materias` | Pública | Lista as matérias e em quais modos cada uma está disponível |
+| `POST` | `/api/estudar` | Privada | Recebe `{ materia, conteudo }` e devolve resumo, flashcards e quiz |
+| `POST` | `/api/resolver` | Privada | Recebe `{ materia, enunciado }` e devolve os passos guiados |
+
+As rotas privadas exigem o cabeçalho `Authorization: Bearer <token>`. O token é assinado com HMAC-SHA256 e expira em 8 horas. Por coerência com o princípio do Resolve Aqui, a rota `/api/resolver` nunca devolve a resposta final do exercício, apenas os passos e as dicas.
+
+No front, todas as chamadas passam por `src/services/api.js`, que anexa o token, aplica timeout de 15 segundos e transforma erros HTTP em mensagens legíveis. Se a API responder 401 no meio do uso, a sessão é encerrada e o usuário volta para o login.
+
+---
+
+## Rotas públicas e privadas
+
+| Rota | Acesso | Página |
+|---|---|---|
+| `/` | Pública | Landing page |
+| `/login` | Pública | Login |
+| `/sobre` | Pública | Sobre o projeto e a equipe |
+| `/painel` | Privada | Painel com as estatísticas do estudante |
+| `/camera` | Privada | Câmera |
+| `/estuda-comigo` | Privada | Modo Estuda Comigo |
+| `/resolve-aqui` | Privada | Modo Resolve Aqui |
+| `/privacidade` | Privada | Modo Privacidade Estudante |
+| `/galeria` | Privada | Galeria, lixeira e histórico |
+| `*` | Pública | Página 404 |
+
+As rotas privadas ficam dentro do componente `RotaPrivada`, que redireciona para `/login` quando não há sessão e guarda a rota de origem: depois de entrar, o usuário volta exatamente para onde estava. Ao abrir o app, uma sessão salva no navegador é revalidada na API antes de liberar o acesso.
+
+---
+
+## Hooks customizados
+
+A lógica foi separada das telas. As páginas apenas desenham o que os hooks devolvem.
+
+| Hook | Responsabilidade |
+|---|---|
+| `useAuth` | Estado da sessão: usuário, login e logout |
+| `useLogin` | Validação e envio do formulário de login |
+| `useMaterias` | Busca das matérias na API, com lista reserva se a API cair |
+| `useEstudaComigo` | Fluxo completo do Estuda Comigo: geração pela API, quiz e salvamento |
+| `useResolveAqui` | Fluxo completo do Resolve Aqui: passos pela API, dicas e resultado |
+| `usePrivacidade` | Detecção de rostos, decisão rosto a rosto e exportação |
+| `useCamera` | Acesso à webcam via getUserMedia e captura |
+| `useLocalStorage` | Estado persistido no navegador |
+| `useHistorico` | Registro das ações na galeria |
+
+---
+
 ## Uso de IA no projeto
 
 A IA foi utilizada em duas frentes distintas neste projeto.
 
 **Como assistente de desenvolvimento:** usamos ferramentas de IA para acelerar a estruturação inicial dos componentes React (Layout, Header, Footer), gerar bases de CSS, apoiar o levantamento do que deveria ser migrado do protótipo da Sprint 2 e revisar trechos de código em busca de erros. Duas correções relevantes vieram dessa revisão: a perda de dados do localStorage quando o componente era desmontado no mesmo evento do salvamento, e o encerramento do stream da webcam ao trocar de rota, que no protótipo dependia do evento `beforeunload` e não funcionaria em uma SPA. Todas as decisões de arquitetura, o recorte do escopo, quais telas migrar e a estrutura pai → filho foram tomadas pela equipe. A IA acelerou a implementação, não substituiu o desenho da solução.
 
-**Como conceito simulado dentro do produto:** o LensLab é, por natureza, um produto que dependeria de IA em produção (OCR para ler o texto das fotos, modelos de geração de texto para produzir resumos, flashcards e quizzes, e lógica pedagógica para conduzir a resolução guiada). Como o escopo acadêmico não inclui integrar modelos reais, o arquivo `src/utils/ia-mock.js` simula essas respostas com templates por matéria. Em produção, essa camada seria substituída por chamadas a APIs de IA reais, sem alterar o restante da aplicação.
+**Como modelo real dentro do produto:** o Modo Privacidade Estudante usa um modelo de visão computacional de verdade, o detector de rostos BlazeFace, executado pelo MediaPipe diretamente no navegador. A foto nunca sai do dispositivo do estudante para ser analisada, o que é coerente com a proposta de privacidade do modo. Quando o navegador oferece o detector nativo (Shape Detection API), ele é usado primeiro.
+
+**Como conceito simulado na API:** a geração de resumo, flashcards, quiz e passos guiados dependeria, em produção, de OCR e de modelos de linguagem. Como o escopo acadêmico não inclui custear esses modelos, a API (`/api/estudar` e `/api/resolver`) gera o conteúdo a partir de templates por matéria, em `src/utils/ia-mock.js`. A mudança da Sprint 4 é que essa geração saiu do navegador e passou a rodar no servidor: para trocar a simulação por um modelo real, basta alterar `api/_lib/geracao.js`, sem mexer em nenhuma tela.
 
 ---
 

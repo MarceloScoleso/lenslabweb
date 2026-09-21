@@ -14,7 +14,7 @@ Nome: Gabriel Souza Alexandre Silva
 RM: 572607
 
 Projeto: LensLab - Câmera Inteligente para Estudantes
-Disciplina: Web Development
+Disciplinas: Front-End Design e Web Development (entrega conjunta)
 Instituição: FIAP
-Sprint: 3
+Sprint: 4
 Ano: 2026
