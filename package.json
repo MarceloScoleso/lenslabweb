@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "LensLab - Camera Inteligente para Estudantes (Sprint 3 - Web Development)",
+  "description": "LensLab - Camera Inteligente para Estudantes (Sprint 4 - Front-End Design e Web Development)",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
