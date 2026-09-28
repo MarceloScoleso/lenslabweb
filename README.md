@@ -147,7 +147,7 @@ O app abre vazio de propósito: tudo que aparece nas estatísticas vem das suas 
 ## Estrutura de pastas
 
 ```
-lenslab/
+lenslabweb/
 ├── api/                        # API própria (funções serverless da Vercel)
 │   ├── _lib/
 │   │   ├── auth.js             # Assinatura e validação do token HMAC-SHA256
@@ -460,7 +460,7 @@ A lógica foi separada das telas. As páginas apenas desenham o que os hooks dev
 
 ## Uso de IA no projeto
 
-A IA foi utilizada em duas frentes distintas neste projeto.
+A IA foi utilizada em três frentes distintas neste projeto.
 
 **Como assistente de desenvolvimento:** usamos ferramentas de IA para acelerar a estruturação inicial dos componentes React (Layout, Header, Footer), gerar bases de CSS, apoiar o levantamento do que deveria ser migrado do protótipo da Sprint 2 e revisar trechos de código em busca de erros. Duas correções relevantes vieram dessa revisão: a perda de dados do localStorage quando o componente era desmontado no mesmo evento do salvamento, e o encerramento do stream da webcam ao trocar de rota, que no protótipo dependia do evento `beforeunload` e não funcionaria em uma SPA. Todas as decisões de arquitetura, o recorte do escopo, quais telas migrar e a estrutura pai → filho foram tomadas pela equipe. A IA acelerou a implementação, não substituiu o desenho da solução.
 
